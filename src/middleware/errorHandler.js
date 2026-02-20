@@ -13,7 +13,7 @@
  * See Prisma error reference for details. :contentReference[oaicite:8]{index=8}
  */
 import { HttpError } from '#utils/httpErrors';
-// import { Prisma } from '../../generated/prisma/index.js';
+import { Prisma } from '../../generated/prisma/index.js';
 
 /**
  * @param {import('express').Response} res
@@ -35,48 +35,49 @@ function sendError(res, status, code, message, details = null) {
  * @param {unknown} err
  * @returns {HttpError|null}
  */
-// function mapPrismaError(err) {
-//   // Prisma recommends handling errors by checking their type/code. :contentReference[oaicite:9]{index=9}
-//   if (!(err instanceof Prisma.PrismaClientKnownRequestError)) return null;
+function mapPrismaError(err) {
+  // Prisma recommends handling errors by checking their type/code. :contentReference[oaicite:9]{index=9}
+  if (!(err instanceof Prisma.PrismaClientKnownRequestError)) return null;
 
-//   switch (err.code) {
-//     case 'P2002':
-//       return new HttpError(
-//         409,
-//         'UNIQUE_CONSTRAINT',
-//         'A record with these unique fields already exists.',
-//         err.meta ?? null,
-//       );
-//     case 'P2003':
-//       return new HttpError(
-//         409,
-//         'FOREIGN_KEY_CONSTRAINT',
-//         'A related record was not found (foreign key constraint).',
-//         err.meta ?? null,
-//       );
-//     case 'P2025':
-//       return new HttpError(404, 'RECORD_NOT_FOUND', 'Record not found.', err.meta ?? null);
-//     default:
-//       return new HttpError(500, 'DATABASE_ERROR', 'A database error occurred.', {
-//         code: err.code,
-//         meta: err.meta ?? null,
-//       });
-//   }
-// }
+  switch (err.code) {
+    case 'P2002':
+      return new HttpError(
+        409,
+        'UNIQUE_CONSTRAINT',
+        'A record with these unique fields already exists.',
+        err.meta ?? null,
+      );
+    case 'P2003':
+      return new HttpError(
+        409,
+        'FOREIGN_KEY_CONSTRAINT',
+        'A related record was not found (foreign key constraint).',
+        err.meta ?? null,
+      );
+    case 'P2025':
+      return new HttpError(404, 'RECORD_NOT_FOUND', 'Record not found.', err.meta ?? null);
+    default:
+      return new HttpError(500, 'DATABASE_ERROR', 'A database error occurred.', {
+        code: err.code,
+        meta: err.meta ?? null,
+      });
+  }
+}
 
+// Higher order function to create the error handler with injected dependencies if needed in the future
 export function createErrorHandler({ _functions = {} } = {}) {
   
   return function errorHandler(err, req, res, _next) {
-    // const prismaMapped = mapPrismaError(err);
-    // if (prismaMapped) {
-    //   return sendError(
-    //     res,
-    //     prismaMapped.status,
-    //     prismaMapped.code,
-    //     prismaMapped.message,
-    //     prismaMapped.details,
-    //   );
-    // }
+    const prismaMapped = mapPrismaError(err);
+    if (prismaMapped) {
+      return sendError(
+        res,
+        prismaMapped.status,
+        prismaMapped.code,
+        prismaMapped.message,
+        prismaMapped.details,
+      );
+    }
 
     if (err instanceof HttpError) {
       return sendError(res, err.status, err.code, err.message, err.details);

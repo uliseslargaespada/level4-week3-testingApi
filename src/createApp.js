@@ -6,6 +6,9 @@ import { createErrorHandler } from '#middleware/errorHandler';
 import { notFoundHandler } from '#middleware/notFoundHandler';
 import { respond } from '#middleware/respond';
 
+// Routers
+import { authRouter } from '#routes/auth.routes';
+
 /**
  * Factory that creates the Express app with injected dependencies.
  * This is the pattern that makes testing easy with Supertest.
@@ -32,16 +35,19 @@ export function createApp({ repos = {}, config = {} }) {
   // Response helpers (res.ok/res.created/etc)
   app.use(respond);
 
+  // Health check endpoint
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'ok', message: 'App is running correctly' });
+  });
+
   // Attach repositories to res.locals so controllers can access them
   app.use((_req, res, next) => {
     res.locals.repos = repos;
     next();
   });
 
-  // Health check endpoint
-  app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', message: 'App is running correctly' });
-  });
+  // Register routers
+  app.use('/auth', authRouter);
 
   // Caught not defined routes with a specific message
   app.use(notFoundHandler);
