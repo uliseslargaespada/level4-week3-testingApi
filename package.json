@@ -12,7 +12,10 @@
     "format:write": "prettier . --write",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "docs:validate": "swagger-cli validate ./docs/openapi.yaml"
   },
   "repository": {
     "type": "git",
@@ -44,9 +47,12 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
-    "pg": "^8.18.0"
+    "pg": "^8.18.0",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
+    "@apidevtools/swagger-cli": "^4.0.4",
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",

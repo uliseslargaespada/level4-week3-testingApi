@@ -8,7 +8,7 @@ const env = ensureEnv();
 const repos = await createRepos(prisma);
 
 // The main app
-const app = createApp({
+const app = await createApp({
   repos,
   config: { JWT_SECRET: env.JWT_SECRET },
 });

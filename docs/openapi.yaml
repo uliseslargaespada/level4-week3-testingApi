@@ -1,0 +1,134 @@
+openapi: 3.0.4
+info:
+  title: Template API
+  version: 0.1.0
+  description: >
+    Express REST API (JWT auth) with standardized envelopes and persistence via Prisma + Supabase Postgres.
+servers:
+  - url: http://localhost:3000
+    description: Local dev
+
+tags:
+  - name: Health
+  - name: Auth
+  - name: Users
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApiSuccess:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+        data: {}
+        meta:
+          type: object
+      required: [ok, data]
+
+    ApiError:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: Invalid request data.
+            details: {}
+            requestId:
+              type: string
+              description: Correlates logs with a specific request.
+          required: [code, message]
+      required: [ok, error]
+
+    RegisterRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        firstName: { type: string }
+        lastName: { type: string }
+        password: { type: string, format: password }
+      required: [email, firstName, lastName, password]
+
+    LoginRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+      required: [email, password]
+
+    TokenResponse:
+      type: object
+      properties:
+        token: { type: string }
+      required: [token]
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccess'
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      security: [] # no auth required
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiSuccess' }
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login and return JWT token
+      security: [] # no auth required
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Token issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiSuccess' }
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }

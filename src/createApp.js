@@ -10,6 +10,12 @@ import { respond } from '#middleware/respond';
 import { authRouter } from '#routes/auth.routes';
 import { usersRouter } from '#routes/users.route';
 
+// Import the docs function
+import { createDocsRouter } from '#routes/docs.routes';
+
+// import env helper
+import { ensureEnv } from '#utils/env';
+
 /**
  * Factory that creates the Express app with injected dependencies.
  * This is the pattern that makes testing easy with Supertest.
@@ -17,7 +23,10 @@ import { usersRouter } from '#routes/users.route';
  * @param {{ repos: any, config?: object }} deps
  * @returns {import('express').Express}
  */
-export function createApp({ repos = {}, config = {} }) {
+export async function createApp({ repos = {}, config = {} }) {
+  // Load the needed variables 
+  const { DOCS_ENABLED } = ensureEnv();
+
   // Express functions always return objects that have functionality built in
   // Initialize the app object that's returned from the Express function
   const app = express();
@@ -46,6 +55,8 @@ export function createApp({ repos = {}, config = {} }) {
     res.locals.repos = repos;
     next();
   });
+
+  app.use('/api-docs', await createDocsRouter({ enabled: DOCS_ENABLED === 'true' }));
 
   // Register routers
   app.use('/auth', authRouter);

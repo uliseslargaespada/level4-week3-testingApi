@@ -21,6 +21,9 @@ export function ensureEnv() {
   // Load the database URL
   const DATABASE_URL = process.env.DATABASE_URL ?? '';
 
+  // Load the docs enable
+  const DOCS_ENABLED = process.env.DOCS_ENABLED ?? 'true';
+
   if (!Number.isFinite(PORT) || PORT <= 0) {
     throw new Error('Invalid PORT. Please set PORT to a valid number.');
   }
@@ -34,5 +37,9 @@ export function ensureEnv() {
     throw new Error('Invalid DATABASE_URL. Please set a valid database connection string.');
   }
 
-  return { PORT, JWT_SECRET, PRISMA_LOG_QUERIES, DATABASE_URL };
+  if (DOCS_ENABLED !== 'true' && DOCS_ENABLED !== 'false') {
+    throw new Error('Invalid DOCS_ENABLED. Please set DOCS_ENABLED to "true" or "false".');
+  }
+
+  return { PORT, JWT_SECRET, PRISMA_LOG_QUERIES, DATABASE_URL, DOCS_ENABLED };
 }
