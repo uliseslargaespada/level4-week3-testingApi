@@ -6,6 +6,16 @@ import { createErrorHandler } from '#middleware/errorHandler';
 import { notFoundHandler } from '#middleware/notFoundHandler';
 import { respond } from '#middleware/respond';
 
+// Routers
+import { authRouter } from '#routes/auth.routes';
+import { usersRouter } from '#routes/users.route';
+
+// Import the docs function
+import { createDocsRouter } from '#routes/docs.routes';
+
+// import env helper
+import { ensureEnv } from '#utils/env';
+
 /**
  * Factory that creates the Express app with injected dependencies.
  * This is the pattern that makes testing easy with Supertest.
@@ -13,7 +23,10 @@ import { respond } from '#middleware/respond';
  * @param {{ repos: any, config?: object }} deps
  * @returns {import('express').Express}
  */
-export function createApp({ repos = {}, config = {} }) {
+export async function createApp({ repos = {}, config = {} }) {
+  // Load the needed variables 
+  const { DOCS_ENABLED } = ensureEnv();
+
   // Express functions always return objects that have functionality built in
   // Initialize the app object that's returned from the Express function
   const app = express();
@@ -32,16 +45,22 @@ export function createApp({ repos = {}, config = {} }) {
   // Response helpers (res.ok/res.created/etc)
   app.use(respond);
 
+  // Health check endpoint
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'ok', message: 'App is running correctly' });
+  });
+
   // Attach repositories to res.locals so controllers can access them
   app.use((_req, res, next) => {
     res.locals.repos = repos;
     next();
   });
 
-  // Health check endpoint
-  app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', message: 'App is running correctly' });
-  });
+  app.use('/api-docs', await createDocsRouter({ enabled: DOCS_ENABLED === 'true' }));
+
+  // Register routers
+  app.use('/auth', authRouter);
+  app.use('/users', usersRouter);
 
   // Caught not defined routes with a specific message
   app.use(notFoundHandler);
