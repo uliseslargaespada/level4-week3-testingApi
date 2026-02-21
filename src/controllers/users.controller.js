@@ -4,7 +4,7 @@ import { parsePagination } from '#utils/pagination';
 /**
  * GET /users
  */
-export async function getCurrentUser(req, res) {
+export async function getAllUsers(req, res) {
   const { users } = res.locals.repos;
 
   const { limit, offset } = parsePagination(req.query);

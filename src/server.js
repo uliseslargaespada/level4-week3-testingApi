@@ -16,3 +16,14 @@ const app = createApp({
 app.listen(env.PORT || 3008, () => {
   console.log(`Server is running on http://localhost:${env.PORT || 3008}`);
 });
+
+/**
+ * Graceful shutdown closes DB connections.
+ */
+async function shutdown() {
+  await prisma.$disconnect();
+  process.exit(0);
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

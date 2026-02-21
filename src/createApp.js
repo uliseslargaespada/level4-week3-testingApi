@@ -8,6 +8,7 @@ import { respond } from '#middleware/respond';
 
 // Routers
 import { authRouter } from '#routes/auth.routes';
+import { usersRouter } from '#routes/users.route';
 
 /**
  * Factory that creates the Express app with injected dependencies.
@@ -48,6 +49,7 @@ export function createApp({ repos = {}, config = {} }) {
 
   // Register routers
   app.use('/auth', authRouter);
+  app.use('/users', usersRouter);
 
   // Caught not defined routes with a specific message
   app.use(notFoundHandler);

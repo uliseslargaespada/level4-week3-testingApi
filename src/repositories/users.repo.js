@@ -50,9 +50,14 @@ export function createUsersRepo(prisma) {
 
       const [users, total] = await Promise.all([
         prisma.user.findMany({
-          ...params,
-          take: limit,
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
           skip: offset,
+          take: limit,
           orderBy: { createdAt: 'desc' },
         }),
         prisma.user.count(),
