@@ -1,6 +1,6 @@
 -- Create custom user (role) for Prisma.
 -- Prisma needs createdb for shadow database workflows when using migrate dev.
-create user "prisma" with password 'REPLACE_WITH_A_STRONG_PASSWORD' bypassrls createdb;
+create user "prisma" with password 'prisma_password' bypassrls createdb;
 
 -- Give Postgres ownership of the new user so migrations are visible in Supabase tooling.
 grant "prisma" to "postgres";

@@ -1,4 +1,5 @@
 import { createUsersRepo } from './users.repo.js';
+import { createTodosRepo } from './todos.repo.js';
 
 /**
  * Creates repositories (data layer).
@@ -8,8 +9,8 @@ import { createUsersRepo } from './users.repo.js';
  * @returns {{ users: import('./users.repo.js').UsersRepo }}
  */
 export async function createRepos(prisma) {
-
   return {
     users: createUsersRepo(prisma),
+    todos: createTodosRepo(prisma),
   };
 }

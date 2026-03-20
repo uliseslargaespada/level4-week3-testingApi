@@ -25,3 +25,14 @@ model User {
 
   @@map("users")
 }
+
+model Todo {
+  id            String @id @default(uuid())
+  text          String
+  isCompleted   Boolean @map("is_completed")
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt      @map("updated_at")
+
+  @@map("todos")
+}

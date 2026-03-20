@@ -1,6 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cors from 'cors';
 
 import { createErrorHandler } from '#middleware/errorHandler';
 import { notFoundHandler } from '#middleware/notFoundHandler';
@@ -8,6 +9,7 @@ import { respond } from '#middleware/respond';
 
 // Routers
 import { authRouter } from '#routes/auth.routes';
+import { todosRouter } from '#routes/todos.route';
 import { usersRouter } from '#routes/users.route';
 
 // Import the docs function
@@ -24,7 +26,7 @@ import { ensureEnv } from '#utils/env';
  * @returns {import('express').Express}
  */
 export async function createApp({ repos = {}, config = {} }) {
-  // Load the needed variables 
+  // Load the needed variables
   const { DOCS_ENABLED } = ensureEnv();
 
   // Express functions always return objects that have functionality built in
@@ -45,6 +47,9 @@ export async function createApp({ repos = {}, config = {} }) {
   // Response helpers (res.ok/res.created/etc)
   app.use(respond);
 
+  // Enable CORS for all origins and routes
+  app.use(cors());
+
   // Health check endpoint
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', message: 'App is running correctly' });
@@ -60,6 +65,7 @@ export async function createApp({ repos = {}, config = {} }) {
 
   // Register routers
   app.use('/auth', authRouter);
+  app.use('/todos', todosRouter);
   app.use('/users', usersRouter);
 
   // Caught not defined routes with a specific message
