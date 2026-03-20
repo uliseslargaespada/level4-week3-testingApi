@@ -1,3 +1,4 @@
+import { createAuthRepo } from './auth.repo.js';
 import { createUsersRepo } from './users.repo.js';
 import { createTodosRepo } from './todos.repo.js';
 
@@ -10,6 +11,7 @@ import { createTodosRepo } from './todos.repo.js';
  */
 export async function createRepos(prisma) {
   return {
+    auth: createAuthRepo(prisma),
     users: createUsersRepo(prisma),
     todos: createTodosRepo(prisma),
   };
