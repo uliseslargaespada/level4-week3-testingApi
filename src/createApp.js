@@ -48,7 +48,9 @@ export async function createApp({ repos = {}, config = {} }) {
   app.use(respond);
 
   // Enable CORS for all origins and routes
-  app.use(cors());
+  // Use the origins from the env vars separated by comma, or default to allowing all origins
+  const corsOrigins = config.CORS ? config.CORS.split(',') : '*';
+  app.use(cors({ origin: corsOrigins }));
 
   // Health check endpoint
   app.get('/health', (_req, res) => {
