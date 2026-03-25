@@ -139,3 +139,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 /generated/prisma
+
+# Ignore function zip file from serverless framework
+function.zip

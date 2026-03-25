@@ -66,3 +66,30 @@ export async function loginUser(req, res) {
     user: { id: user.id, email: user.email, name: user.name },
   });
 }
+
+/**
+ * DELETE /auth/logout
+ */
+export async function logoutUser(req, res) {
+  const { auth } = res.locals.repos;
+  const token = req.auth?.token;
+  const expiresAt = getTokenExpiration(req.auth?.payload?.exp);
+
+  if (!token || !expiresAt) {
+    throw unauthorized('Invalid token');
+  }
+
+  await auth.revokeToken({
+    token,
+    expiresAt,
+    userId: req.user?.id ?? null,
+  });
+
+  return res.noContent();
+}
+
+function getTokenExpiration(exp) {
+  if (typeof exp !== 'number') return null;
+
+  return new Date(exp * 1000);
+}
